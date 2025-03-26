@@ -44,6 +44,14 @@ Key aspects of integration testing include:
 
 ## 4. Integration Testing Approaches
 
+| S.No. | Factors                                                   | Suggested Integration Method      |
+| ----- | --------------------------------------------------------- | --------------------------------- |
+| 1     | Clear requirements and design                             | Top-down                          |
+| 2     | Dynamically changing requirements, design, architecture   | Bottom-up                         |
+| 3     | Changing architecture, stable design                      | Bi-directional                    |
+| 4     | Limited changes to existing architecture with less impact | Big bang                          |
+| 5     | Combination of above                                      | Select one after careful analysis |
+
 Based on your specific context, here are the main integration testing approaches to consider:
 
 ### 4.1. Bottom-Up Integration Testing
@@ -351,8 +359,18 @@ To begin implementing this strategy:
    - Provides strategies for test design and implementation
 
 3. **"Continuous Delivery: Reliable Software Releases through Build, Test, and Deployment Automation" by Jez Humble and David Farley**
+
    - Contains valuable insights on integrating testing into CI/CD pipelines
    - Provides strategies for automating integration tests
+
+4. **"Software Testing: Principles and Practices" by Srinivasan Desikan, Gopalaswamy Ramesh**
+
+   - Includes Chapter 5, which focuses on integration testing principles and practices (O'Reilly)
+   - Website: https://learning.oreilly.com/library/view/software-testing-principles/9788177581218/xhtml/chapter005.xhtml#ch5.2
+
+5. **"Foundations of Software Testing" by Dorothy Graham, Isabel Evans, Erik van Veenendaal, Rex Black**
+   - Includes a chapter on component and integration testing.
+   - Website: https://learning.oreilly.com/library/view/foundations-of-software/9788131794760/xhtml/chapter011.xhtml
 
 ### Online Resources and Articles
 
