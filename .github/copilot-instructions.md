@@ -8,6 +8,10 @@ For this LLM integration testing framework project, I use pytest with fixtures, 
 
 My code organization separates test utilities from implementations and uses configuration files for environment settings.
 
+My framework supports mocking and stubbing with unittest.mock or pytest-mock.
+
+My framework understands multiple programming languages as it uses large language models.
+
 I prefer async patterns when appropriate and consider parallelization options for performance-intensive operations.
 
 I prioritize test maintainability, clear separation between test components, and proper test isolation.
