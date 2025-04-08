@@ -60,13 +60,13 @@ OPENAI_API_KEY=your_api_key_here
 To analyze a repository and generate test recommendations:
 
 ```bash
-python -m src.main analyze https://github.com/username/repository-name
+python3 -m src.main analyze https://github.com/username/repository-name
 ```
 
 ### Command-line Options
 
 ```
-Usage: python -m src.main analyze [OPTIONS] REPO_URL
+Usage: python3 -m src.main analyze [OPTIONS] REPO_URL
 
 Arguments:
   REPO_URL  URL of the GitHub repository to analyze  [required]
@@ -117,12 +117,31 @@ The HTML report includes:
 
 ## Advanced Usage
 
+### Using Makefile Targets
+
+The framework provides several convenient Makefile targets for common operations:
+
+```bash
+# Run with test mode (no LLM API calls)
+make test-run
+
+# Run with full LLM analysis
+make run-llm
+
+# Update dependencies without recreating the virtual environment
+make update-deps
+```
+
 ### Testing Without LLM
 
 For development or testing purposes, you can run the framework without making LLM API calls:
 
 ```bash
+# Using Python directly
 python -m src.main analyze https://github.com/username/repository-name --test
+
+# Using the Makefile target
+make test-run
 ```
 
 ### Verbose Logging

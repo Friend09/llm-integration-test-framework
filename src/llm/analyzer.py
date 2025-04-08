@@ -13,6 +13,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Set, Tuple, Union, cast
 
 import httpx
+import networkx as nx
 
 from config.settings import LLMConfig
 from src.analyzer.dependency_analyzer import (AnalysisResult, IntegrationPoint,

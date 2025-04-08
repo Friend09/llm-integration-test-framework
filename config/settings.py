@@ -4,6 +4,7 @@ This module handles loading configuration from environment variables and
 configuration files, providing a consistent interface for the application.
 """
 import os
+import sys
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Dict, Optional, Union
@@ -15,7 +16,7 @@ from dotenv import load_dotenv
 class LLMConfig:
     """Configuration for LLM provider."""
     provider: str
-    api_key: str
+    api_key: Optional[str]
     model: str
     temperature: float = 0.2
     max_tokens: int = 4000
@@ -38,6 +39,7 @@ class AppConfig:
     output_dir: Path
     log_level: str
     debug: bool = False
+    test_mode: bool = False
 
 
 def load_config() -> AppConfig:
@@ -47,16 +49,28 @@ def load_config() -> AppConfig:
         AppConfig: The application configuration object.
 
     Raises:
-        ValueError: If required environment variables are missing.
+        ValueError: If required environment variables are missing and not in test mode.
     """
+    # Determine the project root directory and locate the .env file
+    current_dir = Path(__file__).parent
+    project_root = current_dir.parent
+    env_path = project_root / ".env"
+
     # Load environment variables from .env file if it exists
-    load_dotenv()
+    print(f"Looking for .env at: {env_path}")
+    load_dotenv(dotenv_path=env_path)
+
+    # Check if we're running in test mode
+    test_mode = "--test" in sys.argv or "-t" in sys.argv
 
     # LLM configuration
     llm_provider = os.environ.get("LLM_PROVIDER", "openai")
     llm_api_key = os.environ.get("OPENAI_API_KEY")
 
-    if not llm_api_key:
+    print(f"API Key loaded: {'Yes' if llm_api_key else 'No'}")
+
+    # Only require API key if not in test mode
+    if not llm_api_key and not test_mode:
         raise ValueError("OPENAI_API_KEY environment variable is required")
 
     llm_model = os.environ.get("LLM_MODEL", "gpt-4o-mini")
@@ -94,5 +108,6 @@ def load_config() -> AppConfig:
         scanner=scanner_config,
         output_dir=output_dir,
         log_level=log_level,
-        debug=debug
+        debug=debug,
+        test_mode=test_mode
     )

@@ -161,7 +161,7 @@ async def analyze_repository(
 
         # Print final success message
         console.print(f"\n[bold green]Analysis complete![/bold green]")
-        console.print(f"Report available at: [link file://{report_path}]{report_path}[/link]")
+        console.print(f"Report available at: {report_path}")
 
         return report_path
 
