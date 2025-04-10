@@ -202,9 +202,48 @@ Several algorithms can be used to determine a near-optimal test order for integr
 
 Integration testing requires components to be tested in a specific sequence to minimize dependencies on untested components. When a component being tested depends on another component that hasn't been tested yet, test stubs must be created to simulate the behavior of those untested components. These stubs can be expensive to develop and maintain, making the test order critically important.
 
+Let's visualize our example system that we'll use to demonstrate each algorithm:
+
+```mermaid
+graph TD
+    A[Class A<br>No dependencies]
+    B[Class B<br>Inherits from A]
+    C[Class C<br>Aggregates B]
+    D[Class D<br>Associated with C]
+    E[Class E<br>Associated with D and B]
+    F[Class F<br>Inherits from E]
+
+    B -->|Inherits| A
+    C -->|Aggregates| B
+    D -->|Associated with| C
+    E -->|Associated with| D
+    E -->|Associated with| B
+    F -->|Inherits| E
+
+    classDef inheritance fill:#f9f,stroke:#333,stroke-width:2px;
+    classDef aggregation fill:#bbf,stroke:#333,stroke-width:2px;
+    classDef association fill:#bfb,stroke:#333,stroke-width:2px;
+
+    linkStyle 0 stroke:#f9f,stroke-width:2px;
+    linkStyle 1 stroke:#bbf,stroke-width:2px;
+    linkStyle 2,3,4 stroke:#bfb,stroke-width:2px;
+    linkStyle 5 stroke:#f9f,stroke-width:2px;
+```
+
+**Reference System**: Our example consists of 6 classes (A-F) with specific relationships:
+
+- Class A: Base class with no dependencies
+- Class B: Inherits from A
+- Class C: Aggregates B
+- Class D: Associated with C
+- Class E: Associated with D and B
+- Class F: Inherits from E
+
 The following algorithms offer different approaches to determining integration test order, each with specific advantages depending on your project's characteristics:
 
 ### 7.1 Tai-Daniels (TD) Method
+
+> **Using Reference System**: Classes A-F with inheritance, aggregation, and association relationships
 
 The TD method works by:
 
@@ -212,16 +251,7 @@ The TD method works by:
 - Within each major level, assigning minor levels to minimize stubs
 - Testing components in the order of these assigned levels
 
-Example using a small system with classes A-F, where:
-
-- Class A: No dependencies
-- Class B: Inherits from A
-- Class C: Aggregates B
-- Class D: Associated with C
-- Class E: Associated with D and B
-- Class F: Inherits from E
-
-The TD method would:
+For our reference system (classes A-F), the TD method would:
 
 1. Assign major levels: Level 0 (A), Level 1 (B), Level 2 (C), Level 3 (D, E), Level 4 (F)
 2. Assign minor levels within level 3: D (minor level 0), E (minor level 1)
@@ -229,7 +259,39 @@ The TD method would:
 
 This approach clusters classes based on their "major level," so you'd test all classes at a given level before moving to the next level, which is beneficial when testing related components together.
 
+Here's how the TD method assigns levels and determines test order:
+
+```mermaid
+graph TD
+    A[A<br>Level 0]
+    B[B<br>Level 1]
+    C[C<br>Level 2]
+    D[D<br>Level 3.0]
+    E[E<br>Level 3.1]
+    F[F<br>Level 4]
+
+    A --> B
+    B --> C
+    C --> D
+    D --> E
+    E --> F
+
+    classDef level0 fill:#f9f,stroke:#333,stroke-width:2px;
+    classDef level1 fill:#bbf,stroke:#333,stroke-width:2px;
+    classDef level2 fill:#bfb,stroke:#333,stroke-width:2px;
+    classDef level3 fill:#fbb,stroke:#333,stroke-width:2px;
+    classDef level4 fill:#fbf,stroke:#333,stroke-width:2px;
+
+    class A level0;
+    class B level1;
+    class C level2;
+    class D,E level3;
+    class F level4;
+```
+
 ### 7.2 Traon-Jéron-Jézéquel-Morel (TJJM) Method
+
+> **Using Reference System**: Classes A-F with dependency cycle between E and B
 
 The TJJM method uses:
 
@@ -237,7 +299,7 @@ The TJJM method uses:
 - Recursively breaks these cycles to create a directed acyclic graph
 - Determines test order based on this graph
 
-Using the same example system, TJJM would:
+For our reference system (classes A-F), TJJM would:
 
 1. Identify the cycle between E and B (E has an association with B, and B is indirectly connected to E)
 2. Break the cycle by removing the weakest dependency (association edge from E to B)
@@ -246,7 +308,63 @@ Using the same example system, TJJM would:
 
 The key benefit is that by breaking the cycle at the weakest dependency point (association), we minimize the number of stubs needed during testing.
 
+Here's a visualization of how TJJM identifies and breaks cycles in our reference system:
+
+```mermaid
+graph TD
+    subgraph "Step 1: Identify Cycles"
+        A1[A]
+        B1[B]
+        C1[C]
+        D1[D]
+        E1[E]
+        F1[F]
+
+        B1 -->|"I"| A1
+        C1 -->|"Ag"| B1
+        D1 -->|"As"| C1
+        E1 -->|"As"| D1
+        E1 -->|"As"| B1
+        F1 -->|"I"| E1
+
+        B1 -.->|Cycle Path| C1
+        C1 -.->|Cycle Path| D1
+        D1 -.->|Cycle Path| E1
+        E1 -.->|Cycle Path| B1
+    end
+
+    subgraph "Step 2: Break Cycles"
+        A2[A]
+        B2[B]
+        C2[C]
+        D2[D]
+        E2[E]
+        F2[F]
+
+        B2 -->|"I"| A2
+        C2 -->|"Ag"| B2
+        D2 -->|"As"| C2
+        E2 -->|"As"| D2
+        F2 -->|"I"| E2
+
+        E2 -.->|"Removed As"| B2
+    end
+
+    subgraph "Step 3: Test Order"
+        A3[A<br>1st]
+        B3[B<br>2nd]
+        C3[C<br>3rd]
+        D3[D<br>4th]
+        E3[E<br>5th]
+        F3[F<br>6th]
+
+        A3 --> B3 --> C3 --> D3 --> E3 --> F3
+    end
+```
+
 ### 7.3 Briand-Labiche-Wang (BLW) Method
+
+> **Using Reference System**: Classes A-F focusing on specific stub minimization
 
 The BLW method:
 
@@ -254,27 +372,101 @@ The BLW method:
 - Breaks cycles specifically by removing association edges
 - Prioritizes minimizing specific stubs (stubs that replace concrete implementations)
 
-For the example system, BLW would:
+For our reference system (classes A-F), BLW would:
 
 1. Identify the cycle between E and B
 2. Break the cycle by removing the association edge from E to B
-3. Calculate the number of specific stubs needed for each possible break
-4. Choose the break that minimizes specific stubs
+3. Calculate the number of specific stubs needed for each possible break:
+   - Breaking E→B requires 1 specific stub for B
+   - Breaking other edges would require more specific stubs
+4. Choose the break that minimizes specific stubs (E→B)
 5. Final test order: A → B → C → D → E → F
 
 The BLW method specifically targets minimizing "specific stubs" - which are stubs that replace concrete implementations rather than generic interfaces. This is particularly valuable in object-oriented systems where implementation details matter.
 
+Here's how BLW works with our reference system:
+
+```mermaid
+graph TD
+    subgraph "Step 1: Identify Cycles and Association Edges"
+        A1[A]
+        B1[B]
+        C1[C]
+        D1[D]
+        E1[E]
+        F1[F]
+
+        B1 -->|"I"| A1
+        C1 -->|"Ag"| B1
+        D1 -->|"As"| C1
+        E1 -->|"As"| D1
+        E1 -->|"As"| B1
+        F1 -->|"I"| E1
+
+        E1 -->|"Association Edge<br>to Break"| B1
+    end
+
+    subgraph "Step 2: Calculate Stub Impact"
+        STUB[Remove E→B<br>Requires 1 Specific Stub]
+    end
+
+    subgraph "Step 3: Final Test Order"
+        A3[A<br>1st]
+        B3[B<br>2nd]
+        C3[C<br>3rd]
+        D3[D<br>4th]
+        E3[E<br>5th]
+        F3[F<br>6th]
+
+        A3 --> B3 --> C3 --> D3 --> E3 --> F3
+    end
+```
+
 ### 7.4 Comparison
 
-- **Stubs**: The TJJM method generally creates the fewest stubs.
-- **Specific Stubs**: The BLW method generally creates the fewest specific stubs.
-- **Clustering**: The TD method can cluster classes to be tested together.
+> **Using Reference System**: Comparing all three algorithms on classes A-F
+
+When applied to our reference system (classes A-F), all three algorithms produce the same final test order (A→B→C→D→E→F), but they differ in their approach and considerations:
+
+- **Tai-Daniels**: Groups D and E at the same major level, but assigns different minor levels
+- **TJJM**: Breaks the cycle between E and B to minimize total stubs
+- **BLW**: Specifically targets the E→B association to minimize specific stubs
 
 The choice of algorithm depends on the specific project:
 
-- Use TD Method when you want to test components in logical clusters
-- Use TJJM Method when stub creation is expensive or time-consuming
-- Use BLW Method when specific implementation details are important in testing
+- Use **TD Method** when you want to test components in logical clusters
+- Use **TJJM Method** when stub creation is expensive or time-consuming
+- Use **BLW Method** when specific implementation details are important in testing
+
+Let's visualize the comparison between these algorithms on our reference system:
+
+```mermaid
+graph LR
+    subgraph "Comparison of Test Order Algorithms"
+        TD[Tai-Daniels<br>Method]
+        TJJM[TJJM<br>Method]
+        BLW[BLW<br>Method]
+
+        TD -->|Benefit| Clusters[Logical<br>Component<br>Clustering]
+        TJJM -->|Benefit| TotalStubs[Fewest<br>Total<br>Stubs]
+        BLW -->|Benefit| SpecificStubs[Fewest<br>Specific<br>Stubs]
+
+        TD -->|Best For| TD_Use[Systems with<br>clear hierarchy]
+        TJJM -->|Best For| TJJM_Use[Expensive<br>stub creation]
+        BLW -->|Best For| BLW_Use[Concrete<br>implementation<br>importance]
+    end
+```
+
+### 7.5 Algorithm Implementation Considerations
+
+When implementing these algorithms in our LLM Integration Testing Framework, we need to consider:
+
+1. **Dependency Detection**: Accurate identification of inheritance, aggregation, and association relationships
+2. **Cycle Detection**: Efficient implementation of Tarjan's algorithm for identifying strongly connected components
+3. **Edge Weight Assignment**: Proper weighting of different relationship types
+4. **Performance**: Optimizing for large codebases with complex dependency graphs
+
+Our framework uses networkx for graph operations, which provides efficient implementations of these algorithms.
 
 ## 8. Recommended Strategy
 
@@ -397,7 +589,7 @@ Based on the capabilities of our LLM Integration Testing Framework, the followin
 
 - **PyTest**: Flexible test framework with excellent fixture support
 - **Requests/httpx**: For API testing
-- **SQLAlchemy**: For database integration testing
+- **SQLAlchemy\*\***: For database integration testing
 - **Selenium/Playwright**: For UI integration testing
 - **unittest.mock/pytest-mock**: For creating test doubles
 
