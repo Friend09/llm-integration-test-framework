@@ -1,0 +1,62 @@
+---
+description: Python LLM Integration Testing Framework Project Rules
+globs: ["**/*.py", "**/*.yaml", "**/*.json"]
+alwaysApply: false
+---
+
+# Project Standards and Guidelines
+
+## Development Environment
+- Python 3.x development on macOS with M-series Mac
+- Using UV for dependency management
+- Environment variables managed through `.env` files
+- No hardcoding of credentials (especially OpenAI API keys)
+
+## Code Style & Standards
+- Strict adherence to PEP 8 guidelines
+- Type hints required for all function parameters and returns
+- F-strings preferred for string formatting
+- Google style docstrings required for all functions and classes
+- Descriptive variable names following Python naming conventions
+
+## Data Structures & Models
+- Preference for:
+  - Dataclasses
+  - Named tuples
+  - Pydantic models for data validation
+- Clear separation between data models and business logic
+
+## Testing Framework
+- pytest as primary testing framework
+- Fixtures for test setup and teardown
+- requests/httpx for API testing
+- SQLAlchemy for database interactions
+- networkx for dependency analysis
+- Proper test isolation and component separation
+- Mocking/stubbing using unittest.mock or pytest-mock
+
+## Architecture & Design
+- Async patterns when appropriate
+- Parallelization for performance-critical operations
+- Clear separation of:
+  - Test utilities
+  - Core implementations
+  - Configuration management
+- Support for multiple programming language testing
+- LLM integration capabilities
+
+## Infrastructure
+- Docker for containerization
+- GitHub Actions for CI/CD pipelines
+- Proper environment separation (dev/staging/prod)
+
+## Security
+- Secure coding practices
+- Environment-based configuration
+- No hardcoded secrets or credentials
+- Proper exception handling and logging
+
+## Dependencies
+- All third-party dependencies pinned to specific versions
+- Regular security updates
+- Minimal dependency footprint
