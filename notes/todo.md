@@ -548,3 +548,38 @@
   - [ ] Automate PyPI publishing
   - [ ] Generate documentation
   - [ ] Create release notes
+
+# Example test script
+from src.scanner.repository import RepositoryManager
+from src.scanner.dotnet_scanner import DotNetScanner
+from src.scanner.python_scanner import PythonScanner
+
+# Test with a real repository
+with RepositoryManager("https://github.com/user/repo.git") as repo_path:
+    # Analyze .NET code
+    if (repo_path / "*.csproj").exists():
+        dotnet_scanner = DotNetScanner(repo_path)
+        dotnet_scanner.scan()
+        print("\n.NET Analysis Results:")
+        print_analysis_results(dotnet_scanner.dependency_graph)
+
+    # Analyze Python code
+    if (repo_path / "requirements.txt").exists():
+        python_scanner = PythonScanner(repo_path)
+        python_scanner.scan()
+        print("\nPython Analysis Results:")
+        print_analysis_results(python_scanner.dependency_graph)
+
+def print_analysis_results(graph):
+    print("\nComponents:")
+    for comp in graph.get_components():
+        print(f"- {comp.name} ({comp.component_type})")
+
+    print("\nIntegration Points:")
+    for comp in graph.get_components():
+        if comp.is_integration_point:
+            print(f"- {comp.name}")
+
+    print("\nDependencies:")
+    for dep in graph.get_dependencies():
+        print(f"- {dep.source_component} -> {dep.target_component}")
