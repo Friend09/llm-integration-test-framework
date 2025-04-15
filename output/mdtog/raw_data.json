@@ -1,0 +1,86 @@
+{
+  "timestamp": "2025-04-15T12:49:40.035527",
+  "approach": {
+    "name": "hybrid",
+    "score": 0.5,
+    "advantages": [
+      "Flexible and adaptable approach",
+      "Balanced coverage of system",
+      "Can prioritize critical components",
+      "Good for complex systems"
+    ],
+    "disadvantages": [
+      "More complex to manage",
+      "Requires more planning",
+      "May need more resources"
+    ],
+    "prerequisites": [
+      "Both unit and integration test frameworks",
+      "Test environments for different levels",
+      "Good understanding of component dependencies"
+    ],
+    "risks": [
+      "Complexity in managing different approaches",
+      "Potential gaps between approaches",
+      "Resource allocation challenges"
+    ],
+    "estimated_effort": {
+      "critical_path_testing": 0.3,
+      "subsystem_testing": 0.4,
+      "integration_testing": 0.3
+    }
+  },
+  "test_order": {
+    "metrics": {
+      "total_stub_count": 7,
+      "components_with_stubs": 5,
+      "average_stubs_per_component": 1.0,
+      "stub_component_ratio": 0.7142857142857143
+    },
+    "components": [
+      "Component1",
+      "Component3",
+      "Component5",
+      "Component6",
+      "Component7",
+      "Component2",
+      "Component4"
+    ],
+    "levels": {
+      "Component1": 0,
+      "Component3": 1,
+      "Component5": 2,
+      "Component6": 2,
+      "Component7": 3,
+      "Component2": 4,
+      "Component4": 5
+    },
+    "stubs": {
+      "Component1": [
+        "Component3",
+        "Component2"
+      ],
+      "Component2": [
+        "Component4"
+      ],
+      "Component3": [
+        "Component6",
+        "Component5"
+      ],
+      "Component4": [],
+      "Component5": [
+        "Component7"
+      ],
+      "Component6": [],
+      "Component7": [
+        "Component2"
+      ]
+    }
+  },
+  "system_stats": {
+    "total_components": 7,
+    "total_integration_points": 3,
+    "total_relationships": 7,
+    "total_cycles": 0
+  }
+}

@@ -10,7 +10,7 @@ alwaysApply: false
 - Using UV for dependency management
 - Environment variables managed through `.env` files
 - No hardcoding of credentials (especially OpenAI API keys)
-- always use .venv
+- always use `.venv` for virtual environment
 
 ## Code Style & Standards
 - Strict adherence to PEP 8 guidelines
