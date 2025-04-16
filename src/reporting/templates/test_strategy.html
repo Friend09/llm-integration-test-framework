@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}Test Strategy - LLM Integration Testing Framework Report{% endblock %}
+
+{% block header_title %}Test Strategy{% endblock %}
+
+{% block content %}
+<div class="section">
+    <h2>Test Strategy Overview</h2>
+    <div class="metric-card">
+        <h3>Test Coverage Goals</h3>
+        <p>{{ strategy.coverage_goals }}</p>
+    </div>
+    <div class="metric-card">
+        <h3>Testing Approach</h3>
+        <p>{{ strategy.testing_approach }}</p>
+    </div>
+    <div class="metric-card">
+        <h3>Risk Assessment</h3>
+        <p>{{ strategy.risk_assessment }}</p>
+    </div>
+</div>
+
+<div class="section">
+    <h2>Component Test Strategies</h2>
+    {% for component in strategy.components %}
+    <div class="metric-card">
+        <h3>{{ component.name }}</h3>
+        <div class="component-details">
+            <p><strong>Test Priority:</strong> {{ component.test_priority }}</p>
+            <p><strong>Test Types:</strong> {{ component.test_types|join(", ") }}</p>
+            <p><strong>Test Coverage:</strong> {{ component.test_coverage }}%</p>
+            <p><strong>Test Cases:</strong></p>
+            <ul>
+                {% for test_case in component.test_cases %}
+                <li>{{ test_case }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="section">
+    <h2>Integration Test Strategy</h2>
+    <div class="metric-card">
+        <h3>Integration Points</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>Source</th>
+                    <th>Target</th>
+                    <th>Type</th>
+                    <th>Test Approach</th>
+                    <th>Priority</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for point in strategy.integration_points %}
+                <tr>
+                    <td>{{ point.source }}</td>
+                    <td>{{ point.target }}</td>
+                    <td>{{ point.type }}</td>
+                    <td>{{ point.test_approach }}</td>
+                    <td>{{ point.priority }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_styles %}
+<style>
+.component-details {
+    margin-top: 1rem;
+}
+
+.component-details ul {
+    margin-left: 1.5rem;
+    margin-top: 0.5rem;
+}
+
+.component-details li {
+    margin-bottom: 0.25rem;
+}
+</style>
+{% endblock %}

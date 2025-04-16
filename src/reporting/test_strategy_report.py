@@ -1,9 +1,11 @@
-"""Test strategy report generation module."""
-
-from pathlib import Path
-from typing import Dict, List, Optional
+"""Test strategy report generator."""
+import os
 import json
+from typing import Any, Dict, List, Optional
 from datetime import datetime
+from pathlib import Path
+
+from jinja2 import Environment, FileSystemLoader
 
 from ..models.dependency_graph import DependencyGraph
 from ..models.integration_points.base import IntegrationPoint
@@ -13,17 +15,31 @@ from ..visualization.test_order_visualizer import TestOrderVisualizer
 
 
 class TestStrategyReportGenerator:
-    """Generates comprehensive test strategy reports."""
+    """Generates test strategy reports with LLM insights."""
 
     def __init__(
         self,
         dependency_graph: DependencyGraph,
-        integration_points: List[IntegrationPoint]
+        integration_points: List[IntegrationPoint],
+        llm_analysis: Optional[Dict[str, Any]] = None
     ):
-        """Initialize the report generator."""
+        """Initialize the report generator.
+
+        Args:
+            dependency_graph: The dependency graph to generate reports for
+            integration_points: List of integration points
+            llm_analysis: Optional LLM analysis results
+        """
         self.dependency_graph = dependency_graph
         self.integration_points = integration_points
+        self.llm_analysis = llm_analysis
         self.visualizer = TestOrderVisualizer()
+        self._setup_jinja()
+
+    def _setup_jinja(self) -> None:
+        """Set up Jinja2 environment."""
+        template_dir = Path(__file__).parent / "templates"
+        self.env = Environment(loader=FileSystemLoader(str(template_dir)))
 
     def generate_report(
         self,
@@ -66,211 +82,51 @@ class TestStrategyReportGenerator:
         title: str
     ) -> None:
         """Generate the main HTML report."""
-        html_content = f"""
-        <html>
-        <head>
-            <title>{title}</title>
-            <style>
-                body {{
-                    font-family: Arial, sans-serif;
-                    line-height: 1.6;
-                    margin: 0;
-                    padding: 20px;
-                    color: #333;
-                }}
-                .container {{
-                    max-width: 1200px;
-                    margin: 0 auto;
-                }}
-                h1, h2, h3 {{
-                    color: #2c3e50;
-                    margin-top: 30px;
-                }}
-                .section {{
-                    background: #fff;
-                    padding: 20px;
-                    margin: 20px 0;
-                    border-radius: 5px;
-                    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-                }}
-                .metrics {{
-                    display: grid;
-                    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-                    gap: 20px;
-                    margin: 20px 0;
-                }}
-                .metric-card {{
-                    background: #f8f9fa;
-                    padding: 15px;
-                    border-radius: 5px;
-                    text-align: center;
-                }}
-                .metric-value {{
-                    font-size: 24px;
-                    font-weight: bold;
-                    color: #2c3e50;
-                }}
-                .metric-label {{
-                    color: #666;
-                    font-size: 14px;
-                }}
-                table {{
-                    width: 100%;
-                    border-collapse: collapse;
-                    margin: 20px 0;
-                }}
-                th, td {{
-                    padding: 12px;
-                    border: 1px solid #ddd;
-                    text-align: left;
-                }}
-                th {{
-                    background: #f5f5f5;
-                }}
-                .score {{
-                    font-size: 18px;
-                    font-weight: bold;
-                    color: #2c3e50;
-                }}
-                .list-section {{
-                    margin: 15px 0;
-                }}
-                .list-section h3 {{
-                    color: #2c3e50;
-                    margin-bottom: 10px;
-                }}
-                .list-section ul {{
-                    list-style-type: none;
-                    padding-left: 0;
-                }}
-                .list-section li {{
-                    padding: 8px 0;
-                    border-bottom: 1px solid #eee;
-                }}
-                .visualization {{
-                    text-align: center;
-                    margin: 30px 0;
-                }}
-                .visualization img {{
-                    max-width: 100%;
-                    height: auto;
-                }}
-                .footer {{
-                    margin-top: 50px;
-                    padding-top: 20px;
-                    border-top: 1px solid #eee;
-                    text-align: center;
-                    color: #666;
-                }}
-            </style>
-        </head>
-        <body>
-            <div class="container">
-                <h1>{title}</h1>
-                <div class="section">
-                    <h2>Executive Summary</h2>
-                    <p>
-                        Based on the analysis of {len(self.dependency_graph.get_components())} components and
-                        {len(self.integration_points)} integration points, the recommended testing approach is
-                        <strong>{approach.name}</strong> with a suitability score of {approach.score:.2f}.
-                    </p>
-                </div>
+        # Prepare report data
+        report_data = {
+            "timestamp": datetime.now().isoformat(),
+            "title": title,
+            "approach": {
+                "name": approach.name,
+                "score": approach.score,
+                "advantages": approach.advantages,
+                "disadvantages": approach.disadvantages,
+                "prerequisites": approach.prerequisites,
+                "risks": approach.risks,
+                "estimated_effort": approach.estimated_effort
+            },
+            "test_order": {
+                "metrics": test_order.metrics,
+                "components": [comp.name for comp in test_order.order],
+                "levels": {comp.name: level for comp, level in test_order.level_assignments.items()},
+                "stubs": {
+                    comp.name: [stub.name for stub in stubs]
+                    for comp, stubs in test_order.stubs.items()
+                }
+            },
+            "system_stats": {
+                "total_components": len(self.dependency_graph.get_components()),
+                "total_integration_points": len(self.integration_points),
+                "total_relationships": len(self.dependency_graph.get_relationships()),
+                "total_cycles": len(self.dependency_graph.find_cycles())
+            }
+        }
 
-                <div class="section">
-                    <h2>System Overview</h2>
-                    <div class="metrics">
-                        <div class="metric-card">
-                            <div class="metric-value">{len(self.dependency_graph.get_components())}</div>
-                            <div class="metric-label">Total Components</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-value">{len(self.integration_points)}</div>
-                            <div class="metric-label">Integration Points</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-value">{test_order.metrics['total_stub_count']}</div>
-                            <div class="metric-label">Required Stubs</div>
-                        </div>
-                        <div class="metric-card">
-                            <div class="metric-value">{len(self.dependency_graph.find_cycles())}</div>
-                            <div class="metric-label">Cyclic Dependencies</div>
-                        </div>
-                    </div>
-                </div>
+        # Add LLM analysis if available
+        if self.llm_analysis:
+            report_data.update({
+                "llm_analysis": {
+                    "overall_approach": self.llm_analysis.get("overall_approach", {}),
+                    "component_prioritization": self.llm_analysis.get("component_prioritization", {}),
+                    "test_sequence": self.llm_analysis.get("test_sequence", {}),
+                    "resource_allocation": self.llm_analysis.get("resource_allocation", {}),
+                    "risk_mitigation": self.llm_analysis.get("risk_mitigation", {})
+                }
+            })
 
-                <div class="section">
-                    <h2>Recommended Testing Approach</h2>
-                    <div class="score">Suitability Score: {approach.score:.2f}</div>
-
-                    <div class="list-section">
-                        <h3>Advantages</h3>
-                        <ul>
-                            {"".join(f"<li>{adv}</li>" for adv in approach.advantages)}
-                        </ul>
-                    </div>
-
-                    <div class="list-section">
-                        <h3>Disadvantages</h3>
-                        <ul>
-                            {"".join(f"<li>{dis}</li>" for dis in approach.disadvantages)}
-                        </ul>
-                    </div>
-
-                    <div class="list-section">
-                        <h3>Prerequisites</h3>
-                        <ul>
-                            {"".join(f"<li>{pre}</li>" for pre in approach.prerequisites)}
-                        </ul>
-                    </div>
-
-                    <div class="list-section">
-                        <h3>Risks</h3>
-                        <ul>
-                            {"".join(f"<li>{risk}</li>" for risk in approach.risks)}
-                        </ul>
-                    </div>
-
-                    <h3>Estimated Effort Distribution</h3>
-                    <table>
-                        <tr>
-                            <th>Activity</th>
-                            <th>Effort (%)</th>
-                        </tr>
-                        {"".join(
-                            f"<tr><td>{activity}</td><td>{effort*100:.1f}%</td></tr>"
-                            for activity, effort in approach.estimated_effort.items()
-                        )}
-                    </table>
-                </div>
-
-                <div class="section">
-                    <h2>Test Order Analysis</h2>
-                    <div class="visualization">
-                        <img src="test_order/test_order_graph.png" alt="Test Order Graph">
-                    </div>
-                    <p>For detailed test order information, please see the <a href="test_order/test_order_table.html">Test Order Details</a>.</p>
-                </div>
-
-                <div class="section">
-                    <h2>Integration Points Analysis</h2>
-                    <table>
-                        <tr>
-                            <th>Type</th>
-                            <th>Count</th>
-                            <th>Average Complexity</th>
-                            <th>Average Risk</th>
-                        </tr>
-                        {self._generate_integration_point_stats()}
-                    </table>
-                </div>
-
-                <div class="footer">
-                    <p>Generated on {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}</p>
-                </div>
-            </div>
-        </body>
-        </html>
-        """
+        # Generate HTML report
+        template = self.env.get_template("report.html")
+        html_content = template.render(**report_data)
 
         report_path = output_dir / "index.html"
         report_path.write_text(html_content)

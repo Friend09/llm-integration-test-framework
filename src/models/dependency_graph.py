@@ -14,26 +14,26 @@ class DependencyGraph:
     def __init__(self):
         """Initialize an empty dependency graph."""
         self.graph = nx.DiGraph()
-        self.components: Dict[UUID, Component] = {}
+        self.components: Dict[str, Component] = {}
         self.relationships: Dict[UUID, Relationship] = {}
 
     def add_component(self, component: Component) -> None:
         """Add a component to the graph."""
-        self.components[component.id] = component
-        self.graph.add_node(component.id, component=component)
+        self.components[component.name] = component
+        self.graph.add_node(component.name)
 
     def add_relationship(self, relationship: Relationship) -> None:
         """Add a relationship to the graph."""
         self.relationships[relationship.id] = relationship
         self.graph.add_edge(
-            relationship.source.id,
-            relationship.target.id,
+            relationship.source.name,
+            relationship.target.name,
             relationship=relationship
         )
 
-    def get_component(self, component_id: UUID) -> Optional[Component]:
-        """Get a component by its ID."""
-        return self.components.get(component_id)
+    def get_component(self, component_name: str) -> Optional[Component]:
+        """Get a component by its name."""
+        return self.components.get(component_name)
 
     def get_relationship(self, relationship_id: UUID) -> Optional[Relationship]:
         """Get a relationship by its ID."""
@@ -47,37 +47,30 @@ class DependencyGraph:
         """Get all relationships in the graph."""
         return list(self.relationships.values())
 
-    def get_dependencies(self, component: Component) -> List[Relationship]:
-        """Get all outgoing dependencies for a component."""
-        return [
-            self.graph.edges[component.id, target_id]["relationship"]
-            for target_id in self.graph.successors(component.id)
-        ]
+    def get_dependencies(self) -> List[tuple]:
+        """Get all dependencies in the graph."""
+        return list(self.graph.edges())
 
     def get_dependents(self, component: Component) -> List[Relationship]:
         """Get all incoming dependencies for a component."""
         return [
-            self.graph.edges[source_id, component.id]["relationship"]
-            for source_id in self.graph.predecessors(component.id)
+            self.graph.edges[source_name, component.name]["relationship"]
+            for source_name in self.graph.predecessors(component.name)
         ]
 
-    def find_cycles(self) -> List[List[Component]]:
+    def find_cycles(self) -> List[List[str]]:
         """Find all cycles in the dependency graph."""
-        cycles = list(nx.simple_cycles(self.graph))
-        return [
-            [self.components[node_id] for node_id in cycle]
-            for cycle in cycles
-        ]
+        return list(nx.simple_cycles(self.graph))
 
     def get_strongly_connected_components(self) -> List[Set[Component]]:
         """Find strongly connected components in the graph."""
         sccs = nx.strongly_connected_components(self.graph)
         return [
-            {self.components[node_id] for node_id in scc}
+            {self.components[node_name] for node_name in scc}
             for scc in sccs
         ]
 
-    def calculate_centrality_metrics(self) -> Dict[UUID, Dict[str, float]]:
+    def calculate_centrality_metrics(self) -> Dict[str, Dict[str, float]]:
         """Calculate various centrality metrics for components."""
         metrics = {}
 
@@ -94,12 +87,12 @@ class DependencyGraph:
         except nx.NetworkXError:  # Handle disconnected graphs
             closeness = {node: 0.0 for node in self.graph.nodes()}
 
-        for node_id in self.graph.nodes():
-            metrics[node_id] = {
-                "in_degree": in_degree[node_id],
-                "out_degree": out_degree[node_id],
-                "betweenness": betweenness[node_id],
-                "closeness": closeness[node_id]
+        for node_name in self.graph.nodes():
+            metrics[node_name] = {
+                "in_degree": in_degree[node_name],
+                "out_degree": out_degree[node_name],
+                "betweenness": betweenness[node_name],
+                "closeness": closeness[node_name]
             }
 
         return metrics
@@ -109,7 +102,7 @@ class DependencyGraph:
         metrics = self.calculate_centrality_metrics()
         critical_components = []
 
-        for component_id, metric_values in metrics.items():
+        for component_name, metric_values in metrics.items():
             # Calculate an overall importance score
             importance_score = (
                 metric_values["in_degree"] +
@@ -118,13 +111,13 @@ class DependencyGraph:
                 metric_values["closeness"]
             ) / 4.0
 
-            component = self.components[component_id]
+            component = self.components[component_name]
             if importance_score >= threshold:
                 critical_components.append(component)
 
         return sorted(
             critical_components,
-            key=lambda c: metrics[c.id]["betweenness"],
+            key=lambda c: metrics[c.name]["betweenness"],
             reverse=True
         )
 
@@ -144,7 +137,7 @@ class DependencyGraph:
         components = {}
         for comp_data in data["components"]:
             component = Component.from_dict(comp_data)
-            components[str(component.id)] = component
+            components[comp_data["name"]] = component
             graph.add_component(component)
 
         # Then create relationships

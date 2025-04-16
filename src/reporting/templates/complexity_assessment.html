@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="section complexity-assessment">
+    <h2>Complexity Assessment</h2>
+
+    <div class="overall-complexity">
+        <h3>Overall Complexity Score</h3>
+        <div class="complexity-score">
+            {{ data.overall_complexity_score }}
+            <span class="score-label">/ 10</span>
+        </div>
+    </div>
+
+    <div class="component-complexity">
+        <h3>Component Complexity Analysis</h3>
+        <div class="complexity-table-container">
+            <table class="complexity-table">
+                <thead>
+                    <tr>
+                        <th>Component</th>
+                        <th>Complexity Score</th>
+                        <th>Factors</th>
+                        <th>Testing Impact</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for component in data.component_complexity %}
+                    <tr>
+                        <td>{{ component.name }}</td>
+                        <td class="score {{ component.score_level }}">{{ component.score }}</td>
+                        <td>
+                            <ul class="factors-list">
+                                {% for factor in component.factors %}
+                                <li>{{ factor }}</li>
+                                {% endfor %}
+                            </ul>
+                        </td>
+                        <td>{{ component.testing_impact }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="resource-requirements">
+        <h3>Resource Requirements</h3>
+        <div class="requirements-grid">
+            <div class="requirement-card">
+                <h4>Estimated Testing Time</h4>
+                <p>{{ data.estimated_testing_time }}</p>
+            </div>
+            {% for resource, details in data.resource_requirements.items() %}
+            <div class="requirement-card">
+                <h4>{{ resource }}</h4>
+                <p>{{ details.description }}</p>
+                <p class="quantity">Quantity: {{ details.quantity }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <div class="recommendations">
+        <h3>Testing Recommendations</h3>
+        <ul class="recommendations-list">
+            {% for recommendation in data.recommendations %}
+            <li>{{ recommendation }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+</div>
+
+<style>
+.complexity-assessment {
+    padding: 20px;
+}
+
+.overall-complexity {
+    text-align: center;
+    margin-bottom: 30px;
+}
+
+.complexity-score {
+    font-size: 48px;
+    font-weight: bold;
+    color: #333;
+}
+
+.score-label {
+    font-size: 24px;
+    color: #666;
+}
+
+.complexity-table-container {
+    overflow-x: auto;
+    margin: 20px 0;
+}
+
+.complexity-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.complexity-table th,
+.complexity-table td {
+    padding: 12px;
+    border: 1px solid #ddd;
+}
+
+.complexity-table th {
+    background-color: #f5f5f5;
+}
+
+.score {
+    font-weight: bold;
+    text-align: center;
+}
+
+.score.high {
+    color: #dc3545;
+}
+
+.score.medium {
+    color: #ffc107;
+}
+
+.score.low {
+    color: #28a745;
+}
+
+.factors-list {
+    margin: 0;
+    padding-left: 20px;
+}
+
+.requirements-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+    margin: 20px 0;
+}
+
+.requirement-card {
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+}
+
+.requirement-card h4 {
+    margin: 0 0 10px 0;
+    color: #333;
+}
+
+.quantity {
+    margin-top: 10px;
+    font-weight: bold;
+    color: #666;
+}
+
+.recommendations-list {
+    list-style-type: disc;
+    padding-left: 20px;
+}
+
+.recommendations-list li {
+    margin-bottom: 10px;
+}
+</style>
+{% endblock %}

@@ -10,11 +10,11 @@ from .base import IntegrationPoint
 class APIIntegrationPoint(IntegrationPoint):
     """Represents an API endpoint or integration point in the system."""
 
-    http_method: str = "GET"  # HTTP method (GET, POST, etc.)
-    route_pattern: str = "/"  # URL pattern or route
+    http_method: str = field(default="GET")
+    route_pattern: str = field(default="/")
+    auth_required: bool = field(default=False)
     request_params: Dict[str, str] = field(default_factory=dict)  # Expected request parameters
     response_type: str = "json"  # Expected response type
-    auth_required: bool = False  # Whether authentication is required
     rate_limited: bool = False  # Whether the endpoint is rate limited
     api_version: Optional[str] = None  # API version if applicable
 

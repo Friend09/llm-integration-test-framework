@@ -1,16 +1,17 @@
 ---
-description: Python LLM Integration Testing Framework Project Rules
+description: 
 globs: 
-alwaysApply: false
+alwaysApply: true
 ---
 # Project Standards and Guidelines
 
 ## Development Environment
 - Python 3.x development on macOS with M-series Mac
+- always use `.venv` for virtual environment
 - Using UV for dependency management
 - Environment variables managed through `.env` files
+- Refer Makefile for repeated terminal based commands related to this project
 - No hardcoding of credentials (especially OpenAI API keys)
-- always use `.venv` for virtual environment
 
 ## Code Style & Standards
 - Strict adherence to PEP 8 guidelines

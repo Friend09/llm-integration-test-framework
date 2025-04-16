@@ -1,5 +1,4 @@
-"""Base class for integration points in the system."""
-
+"""Base integration point model."""
 from dataclasses import dataclass, field
 from typing import Dict, Optional, List
 from uuid import UUID, uuid4
@@ -7,18 +6,17 @@ from uuid import UUID, uuid4
 
 @dataclass
 class IntegrationPoint:
-    """Base class for representing integration points in the system."""
-
+    """Base class for integration points."""
     name: str
-    location: str  # file path or module path
-    integration_type: str  # API, Database, Service, etc.
-    source_component: str  # Component that contains this integration point
-    target_component: str  # Component being integrated with
+    location: str
+    integration_type: str
+    source_component: str
+    target_component: str
+    id: UUID = field(default_factory=uuid4)
+    description: Optional[str] = None
     complexity_score: float = 0.0
     risk_score: float = 0.0
     metadata: Dict[str, str] = field(default_factory=dict)
-    id: UUID = field(default_factory=uuid4)
-    description: Optional[str] = None
     test_requirements: List[str] = field(default_factory=list)
 
     def to_dict(self) -> Dict:

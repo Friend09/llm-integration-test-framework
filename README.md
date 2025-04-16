@@ -1,166 +1,67 @@
-# LLM Integration Testing Framework
+# LLM Integration Test Framework
 
-A powerful framework that leverages LLMs to analyze codebases and generate comprehensive integration testing strategies.
-
-## Current Status
-
-The framework has completed Phase 4 of development. Here's what's working:
-
-✓ Core infrastructure and utilities
-✓ Repository management and cloning
-✓ Python codebase analysis
-  - Framework detection (Flask, Django, FastAPI)
-  - Database integration detection
-  - Service communication analysis
-✓ .NET codebase analysis
-  - ASP.NET Core detection
-  - Entity Framework integration
-  - Dependency injection analysis
-✓ Dependency graph generation
-✓ Integration point detection
-✓ Test Strategy Generation
-  - Test approach recommendation
-  - Multiple test order algorithms (Tai-Daniels, TJJM, BLW)
-  - Algorithm comparison and selection
-  - Detailed justification and metrics
+A comprehensive framework for analyzing repositories and generating test strategies using Large Language Models.
 
 ## Features
 
-Current capabilities:
-- Repository analysis for Python and .NET codebases
-- Critical component identification
-- Integration point detection
-- Framework-specific analysis
-- Dependency graph generation
-- Comprehensive test strategy generation
-  - Multiple test order algorithms
-  - Intelligent algorithm selection
-  - Stub complexity analysis
-  - Test sequence optimization
+- **Repository Analysis**: Automatically analyze repository structure and identify components for testing
+- **Test Strategy Generation**: Use LLM to generate comprehensive test strategies based on code analysis
+- **Risk Assessment**: Identify high-risk components and integration points
+- **Comprehensive Reporting**: Generate detailed HTML reports with visualizations
+- **Mock Mode**: Test the framework without making actual LLM API calls
+- **PDF Export**: Export reports to PDF format for sharing
 
-Coming soon (Phase 5):
-- LLM Integration
-  - OpenAI API integration
-  - Prompt engineering
-  - Response parsing
-  - Enhanced analysis capabilities
-
-## Installation
+## Quick Start
 
 1. Clone the repository:
-```bash
-git clone https://github.com/yourusername/llm-integration-test-framework.git
-cd llm-integration-test-framework
-```
+   ```bash
+   git clone https://github.com/yourusername/llm-integration-test-framework.git
+   cd llm-integration-test-framework
+   ```
 
-2. Create a virtual environment and activate it:
-```bash
-python -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
-```
+2. Set up your environment:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   pip install -e .
+   ```
 
-3. Install dependencies:
-```bash
-pip install -r requirements.txt
-```
+3. Create a `.env` file using the provided template:
+   ```bash
+   cp .env.example .env
+   ```
 
-## Usage
+4. Edit the `.env` file to add your OpenAI API key and configure other settings.
 
-The framework can be used programmatically to analyze both Python and .NET codebases:
+5. Run a test analysis:
+   ```bash
+   python test_end_to_end.py
+   ```
 
-```python
-from src.scanner.repository import RepositoryManager
-from src.scanner.dotnet_scanner import DotNetScanner
-from src.scanner.python_scanner import PythonScanner
-from pathlib import Path
+## Documentation
 
-# Clone and analyze a repository
-with RepositoryManager("https://github.com/user/repo.git") as repo_path:
-    # For .NET projects
-    dotnet_scanner = DotNetScanner(repo_path)
-    dotnet_scanner.scan()
-    dotnet_graph = dotnet_scanner.dependency_graph
+For detailed installation and usage instructions, see:
 
-    # For Python projects
-    python_scanner = PythonScanner(repo_path)
-    python_scanner.scan()
-    python_graph = python_scanner.dependency_graph
+- [Installation Guide](INSTALL.md)
+- [API Documentation](docs/api.md)
+- [Configuration Options](docs/configuration.md)
 
-    # Access analysis results
-    components = dotnet_graph.get_components()
-    dependencies = dotnet_graph.get_dependencies()
+## Example Output
 
-    # Find integration points
-    endpoints = [c for c in components if c.is_integration_point]
-```
+The framework generates comprehensive HTML reports including:
+- Executive Summary
+- Component Analysis
+- Test Strategy Recommendations
+- Risk Assessment
+- Complexity Analysis
+- Test Order Recommendations
 
-## Development
-
-1. Install development dependencies:
-```bash
-pip install -r requirements.txt
-```
-
-2. Run tests:
-```bash
-pytest tests/
-```
-
-3. Run linting and type checking:
-```bash
-flake8 src/
-mypy src/
-```
-
-## Project Structure
-
-```
-src/
-├── config/         # Configuration management
-├── utils/          # Utility functions
-├── scanner/        # Repository scanning
-│   ├── base.py    # Base scanner interface
-│   ├── repository.py  # Repository management
-│   ├── python_scanner.py  # Python analysis
-│   └── dotnet_scanner.py  # .NET analysis
-├── models/         # Data models
-└── tests/         # Test suite
-```
-
-## Demo Capabilities
-
-Current framework can demonstrate:
-1. Repository Management
-   - Clone and manage Git repositories
-   - Support for HTTPS and SSH
-   - Temporary directory handling
-
-2. Python Analysis
-   - Framework detection (Flask/Django/FastAPI)
-   - Database integration detection
-   - Service communication analysis
-   - Package dependency mapping
-
-3. .NET Analysis
-   - ASP.NET Core component detection
-   - Entity Framework integration
-   - Dependency injection analysis
-   - API endpoint mapping
-
-4. Dependency Analysis
-   - Component relationship mapping
-   - Integration point detection
-   - Dependency graph generation
-   - Inheritance hierarchy analysis
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Run tests and linting
-5. Submit a pull request
+Reports are saved to the `reports/` directory.
 
 ## License
 
-This project is licensed under the MIT License - see the LICENSE file for details.
+MIT License
+
+## Contributing
+
+Contributions are welcome! Please see [INSTALL.md](INSTALL.md) for development setup and contribution guidelines.

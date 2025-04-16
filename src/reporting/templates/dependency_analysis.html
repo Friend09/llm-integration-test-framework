@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+
+{% block title %}Dependency Analysis - LLM Integration Testing Framework Report{% endblock %}
+
+{% block header_title %}Dependency Analysis{% endblock %}
+
+{% block content %}
+<div class="section">
+    <h2>Dependency Graph</h2>
+    <div class="metric-card">
+        <h3>Component Dependencies</h3>
+        <div class="graph-container">
+            <img src="{{ dependency_graph_image }}" alt="Dependency Graph" class="graph-image">
+        </div>
+    </div>
+</div>
+
+<div class="section">
+    <h2>Dependency Metrics</h2>
+    <div class="metric-card">
+        <h3>Total Components</h3>
+        <p class="value">{{ metrics.total_components }}</p>
+    </div>
+    <div class="metric-card">
+        <h3>Total Dependencies</h3>
+        <p class="value">{{ metrics.total_dependencies }}</p>
+    </div>
+    <div class="metric-card">
+        <h3>Average Dependencies per Component</h3>
+        <p class="value">{{ "%.2f"|format(metrics.avg_dependencies_per_component) }}</p>
+    </div>
+</div>
+
+<div class="section">
+    <h2>Component Details</h2>
+    <div class="metric-card">
+        <table>
+            <thead>
+                <tr>
+                    <th>Component</th>
+                    <th>Type</th>
+                    <th>Dependencies</th>
+                    <th>Dependents</th>
+                    <th>Complexity</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for component in components %}
+                <tr>
+                    <td>{{ component.name }}</td>
+                    <td>{{ component.type }}</td>
+                    <td>{{ component.dependencies|length }}</td>
+                    <td>{{ component.dependents|length }}</td>
+                    <td>{{ component.complexity_score }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_styles %}
+<style>
+.graph-container {
+    width: 100%;
+    overflow-x: auto;
+    margin: 1rem 0;
+}
+
+.graph-image {
+    width: 100%;
+    max-width: 100%;
+    height: auto;
+}
+</style>
+{% endblock %}

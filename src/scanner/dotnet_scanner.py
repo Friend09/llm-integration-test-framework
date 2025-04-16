@@ -58,9 +58,15 @@ class ClassInfo:
 class DotNetScanner(BaseScanner):
     """Scanner for .NET/C# source code files."""
 
-    def __init__(self, *args, **kwargs):
-        """Initialize the .NET scanner."""
-        super().__init__(*args, **kwargs)
+    def __init__(self, root_path: Path = None, *args, **kwargs):
+        """Initialize the .NET scanner.
+
+        Args:
+            root_path: Root directory to scan
+        """
+        if root_path is None:
+            raise ValueError("root_path is required for DotNetScanner")
+        super().__init__(root_path=root_path, *args, **kwargs)
         self._usings: Dict[Path, List[UsingInfo]] = {}
         self._classes: Dict[Path, List[ClassInfo]] = {}
         self._dependency_graph = DependencyGraph()

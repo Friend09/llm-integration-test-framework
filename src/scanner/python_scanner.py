@@ -46,9 +46,15 @@ class ClassInfo:
 class PythonScanner(BaseScanner):
     """Scanner for Python source code files."""
 
-    def __init__(self, *args, **kwargs):
-        """Initialize the Python scanner."""
-        super().__init__(*args, **kwargs)
+    def __init__(self, root_path: Path = None, *args, **kwargs):
+        """Initialize the Python scanner.
+
+        Args:
+            root_path: Root directory to scan
+        """
+        if root_path is None:
+            raise ValueError("root_path is required for PythonScanner")
+        super().__init__(root_path=root_path, *args, **kwargs)
         self._imports: Dict[Path, List[ImportInfo]] = {}
         self._functions: Dict[Path, List[FunctionInfo]] = {}
         self._classes: Dict[Path, List[ClassInfo]] = {}
@@ -62,6 +68,27 @@ class PythonScanner(BaseScanner):
             List of glob patterns for Python files
         """
         return ["**/*.py"]
+
+    def _default_exclude_patterns(self) -> List[str]:
+        """Return default glob patterns for files to exclude.
+
+        Returns:
+            List of glob patterns for files to exclude
+        """
+        return [
+            "**/__pycache__/**",
+            "**/*.pyc",
+            "**/.git/**",
+            "**/node_modules/**",
+            "**/venv/**",
+            "**/.env/**",
+            "**/bin/**",
+            "**/obj/**",
+            "**/.pytest_cache/**",
+            "**/.mypy_cache/**",
+            "**/.coverage",
+            "**/htmlcov/**"
+        ]
 
     def scan_file(self, file_path: Path) -> None:
         """Scan a Python file and extract information.
