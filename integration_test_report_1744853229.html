@@ -1,0 +1,164 @@
+
+        <!DOCTYPE html>
+        <html>
+        <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <title>Integration Testing Analysis Report</title>
+            <style>
+                body { font-family: Arial, sans-serif; line-height: 1.6; margin: 0; padding: 20px; color: #333; }
+                h1, h2, h3 { color: #2c3e50; }
+                .container { max-width: 1200px; margin: 0 auto; }
+                .summary-box { background-color: #f8f9fa; border-left: 4px solid #4CAF50; padding: 15px; margin-bottom: 20px; }
+                table { width: 100%; border-collapse: collapse; margin-bottom: 20px; }
+                th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+                th { background-color: #f2f2f2; }
+                tr:nth-child(even) { background-color: #f9f9f9; }
+                .component-card { background-color: #fff; border: 1px solid #ddd; border-radius: 4px; padding: 15px; margin-bottom: 15px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+                .strategy-section { background-color: #e8f4f8; padding: 15px; border-radius: 4px; margin-bottom: 20px; }
+                .priority-high { color: #d9534f; }
+                .priority-medium { color: #f0ad4e; }
+                .priority-low { color: #5bc0de; }
+            </style>
+        </head>
+        <body>
+            <div class="container">
+                <h1>Integration Testing Analysis Report</h1>
+
+                <div class="summary-box">
+                    <h2>Testing Strategy Summary</h2>
+                    <p><strong>Recommended Approach:</strong> Use a combination of mock/stub data for unit testing and integration testing with actual data for end-to-end testing.</p>
+                    <p><strong>Justification:</strong> This approach ensures that individual components are correctly handling inputs and outputs before testing them in a live environment.</p>
+                    <p><strong>Suggested Test Order:</strong> Config, WebCrawler, LLMAnalyzer, TestGenerator, SitemapCrawler</p>
+                    <p><strong>Critical Areas:</strong> Data extraction and analysis flow from WebCrawler to LLMAnalyzer to TestGenerator, Configuration loading and error handling in Config</p>
+                </div>
+
+                <h2>Components</h2>
+                <div class="components-container">
+                    
+            <div class="component-card">
+                <h3>Config</h3>
+                <p><strong>Path:</strong> config/config.py</p>
+                <p><strong>Language:</strong> Python</p>
+                <p><strong>Importance:</strong> 5</p>
+                <p><strong>Dependencies:</strong> os, dataclasses, typing, dotenv</p>
+                <p>Handles configuration settings for the LLM Smoke Test Framework, including environment variable loading and validation.</p>
+            </div>
+            
+            <div class="component-card">
+                <h3>WebCrawler</h3>
+                <p><strong>Path:</strong> core/crawler.py</p>
+                <p><strong>Language:</strong> Python</p>
+                <p><strong>Importance:</strong> 4</p>
+                <p><strong>Dependencies:</strong> selenium, Config</p>
+                <p>Responsible for crawling web pages, extracting data, and optionally capturing screenshots.</p>
+            </div>
+            
+            <div class="component-card">
+                <h3>LLMAnalyzer</h3>
+                <p><strong>Path:</strong> core/llm_analyzer.py</p>
+                <p><strong>Language:</strong> Python</p>
+                <p><strong>Importance:</strong> 4</p>
+                <p><strong>Dependencies:</strong> openai, Config</p>
+                <p>Analyzes web pages using LLMs to generate test recommendations and insights.</p>
+            </div>
+            
+            <div class="component-card">
+                <h3>TestGenerator</h3>
+                <p><strong>Path:</strong> core/test_generator.py</p>
+                <p><strong>Language:</strong> Python</p>
+                <p><strong>Importance:</strong> 4</p>
+                <p><strong>Dependencies:</strong> Config, LLMAnalyzer</p>
+                <p>Generates test scripts based on the analysis provided by LLMAnalyzer.</p>
+            </div>
+            
+            <div class="component-card">
+                <h3>SitemapCrawler</h3>
+                <p><strong>Path:</strong> core/sitemap_crawler.py</p>
+                <p><strong>Language:</strong> Python</p>
+                <p><strong>Importance:</strong> 3</p>
+                <p><strong>Dependencies:</strong> Config, WebCrawler</p>
+                <p>Discovers and maps website structure, useful for site-wide testing.</p>
+            </div>
+            
+                </div>
+
+                <h2>Integration Points</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Source</th>
+                            <th>Target</th>
+                            <th>Type</th>
+                            <th>Complexity</th>
+                            <th>Description</th>
+                            <th>Testing Approach</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+            <tr>
+                <td>WebCrawler</td>
+                <td>LLMAnalyzer</td>
+                <td>data flow</td>
+                <td>3</td>
+                <td>WebCrawler extracts page data and screenshots, which are then analyzed by LLMAnalyzer.</td>
+                <td>Mock WebCrawler outputs and test LLMAnalyzer's response to various data scenarios.</td>
+            </tr>
+            
+            <tr>
+                <td>LLMAnalyzer</td>
+                <td>TestGenerator</td>
+                <td>data flow</td>
+                <td>3</td>
+                <td>LLMAnalyzer provides analysis results that are used by TestGenerator to create test scripts.</td>
+                <td>Use stubbed analysis data to verify that TestGenerator produces correct test scripts.</td>
+            </tr>
+            
+            <tr>
+                <td>Config</td>
+                <td>All Components</td>
+                <td>configuration dependency</td>
+                <td>2</td>
+                <td>All major components depend on Config for configuration settings.</td>
+                <td>Validate configuration loading and error handling in each component.</td>
+            </tr>
+            
+                    </tbody>
+                </table>
+
+                <h2>Recommendations</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Description</th>
+                            <th>Priority</th>
+                            <th>Effort</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        
+            <tr>
+                <td>Implement comprehensive unit tests for the Config class to ensure all environment variables are loaded correctly and errors are handled.</td>
+                <td>High</td>
+                <td>Low</td>
+            </tr>
+            
+            <tr>
+                <td>Create integration tests that cover the flow from WebCrawler to TestGenerator, ensuring that data is correctly passed and transformed.</td>
+                <td>High</td>
+                <td>Medium</td>
+            </tr>
+            
+            <tr>
+                <td>Develop end-to-end tests that simulate user interactions and verify the output of the TestGenerator.</td>
+                <td>Medium</td>
+                <td>High</td>
+            </tr>
+            
+                    </tbody>
+                </table>
+            </div>
+        </body>
+        </html>
+        
