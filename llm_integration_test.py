@@ -225,7 +225,7 @@ class LLMIntegrationTestFramework:
         # Call OpenAI API
         try:
             response = self.client.chat.completions.create(
-                model="gpt-4-turbo",
+                model="gpt-4o-mini",
                 messages=[
                     {"role": "system", "content": "You are an expert software architect specializing in integration testing. You analyze code repositories to identify critical components, integration points, and recommend testing strategies."},
                     {"role": "user", "content": prompt}

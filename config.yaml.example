@@ -1,0 +1,35 @@
+# LLM Integration Testing Framework Configuration
+
+# LLM settings (OpenAI)
+llm:
+  model: "gpt-4"  # Model to use for analysis
+  temperature: 0.0  # Lower values for more deterministic output
+  max_tokens: 2000  # Maximum tokens per request
+
+# GitHub integration settings
+github:
+  api_url: "https://api.github.com"  # GitHub API URL (change for enterprise)
+
+# Code analysis settings
+analysis:
+  max_file_size: 1000000  # Maximum file size to analyze (in bytes)
+  exclude_patterns:  # Patterns to exclude from analysis
+    - "**/tests/*"
+    - "**/venv/*"
+    - "**/.git/*"
+    - "**/node_modules/*"
+    - "**/bin/*"
+    - "**/obj/*"
+  include_patterns:  # Patterns to include in analysis
+    - "**/*.py"
+    - "**/*.cs"
+
+# Output settings
+output:
+  output_dir: "reports"  # Directory for generated reports
+  report_format: "html"  # Report format (html or json)
+  include_visualizations: true  # Include interactive visualizations
+
+# Note: Sensitive values like API keys should be set via environment variables:
+# - OPENAI_API_KEY: OpenAI API key
+# - GITHUB_TOKEN: GitHub personal access token
